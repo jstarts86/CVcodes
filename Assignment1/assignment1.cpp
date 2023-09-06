@@ -18,7 +18,8 @@ int main() {
     fps = cap.get(CAP_PROP_FPS); 
     delay = 1000 /fps;
 
-    for(int i = 0; i <= 72; i++){
+    int total_frame = cap.get(CAP_PROP_FRAME_COUNT);
+    for(int i = 1; i <= 72; i++){
         cap >> frame;
         
         if (frame.empty()) {
@@ -26,15 +27,15 @@ int main() {
             break;
         }
         imshow("video", frame);
-
+        int current_frame = cap.get(CAP_PROP_POS_FRAMES);
+        printf("frames: %d / %d\n", current_frame,total_frame);
         waitKey(delay);
     }
-
-    double total_frame = cap.get(CAP_PROP_FRAME_COUNT);
+    
     double time_in_msec = cap.get(CAP_PROP_POS_MSEC);
-    int current_frame = cap.get(CAP_PROP_POS_FRAMES);
-    printf("fps is %d \ntotal frame count is %f\ntime in msec is %f\n Current frame is %d", fps,total_frame,time_in_msec,current_frame);
-
+   
+    //printf("fps is %d \ntotal frame count is %f\ntime in msec is %f\n Current frame is %d", fps,total_frame,time_in_msec,current_frame);
+    
     // while(1) {
     //     cap >> frame;
 
@@ -46,7 +47,4 @@ int main() {
 
     //     waitKey(delay);
     // }
-
-
-
 }
