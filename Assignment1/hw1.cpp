@@ -17,23 +17,22 @@ int main() {
 
     fps = cap.get(CAP_PROP_FPS); 
     delay = 1000 /fps;
-
-    for(int i = 0; i <= 72; i++){
+    int seconds  = fps * 3;
+    int total_frame = cap.get(CAP_PROP_FRAME_COUNT);
+    for(int i = 1; i <= seconds; i++){
         cap >> frame;
         
+        int current_frame = cap.get(CAP_PROP_POS_FRAMES);
         if (frame.empty()) {
             cout << "end of video" << endl;
             break;
         }
         imshow("video", frame);
-
+        printf("frames:  %d / %d\n", current_frame, total_frame); 
         waitKey(delay);
     }
 
-    double total_frame = cap.get(CAP_PROP_FRAME_COUNT);
-    double time_in_msec = cap.get(CAP_PROP_POS_MSEC);
-    int current_frame = cap.get(CAP_PROP_POS_FRAMES);
-    printf("fps is %d \ntotal frame count is %f\ntime in msec is %f\n Current frame is %d", fps,total_frame,time_in_msec,current_frame);
+    //printf("fps is %d \ntotal frame count is %f\ntime in msec is %f\n Current frame is %d", fps,total_frame,time_in_msec,current_frame);
 
     // while(1) {
     //     cap >> frame;
