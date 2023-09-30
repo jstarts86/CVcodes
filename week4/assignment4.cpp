@@ -45,36 +45,47 @@ Mat canny_edges_right(Mat input){
 
 Mat line_merge_left(Mat input) {
     Mat edge, result;
+    Rect right_rect(220,400,400,200); 
+    Mat input_right = input(right_rect);
     float rho, theta, a, b, x0,y0;
     Point p1, p2;
     vector<Vec2f> lines;
     result = input.clone();
     // gray image
     Mat gray_image;
-    cvtColor(input, gray_image, CV_BGR2GRAY);
+    cvtColor(input_right, gray_image, CV_BGR2GRAY);
     // blur gray image
     Mat input_gray_blur;
     blur(gray_image, input_gray_blur,Size(5,5));
     // Canny Edge
     Canny(input_gray_blur, edge,10,60);
-    HoughLines(edge, lines,1 ,CV_PI / 180, 150,0, CV_PI, 30,60);
+    HoughLines(edge, lines,1 ,CV_PI / 180, 150,0, CV_PI, (30 * (CV_PI/180)),(60 * (CV_PI/180)));
+    float avg_rho = 0;
+    float avg_theta = 0;
+    int count = 0;
     for(int i = 0; i < lines.size(); i++) {
         rho = lines[i][0];
         theta = lines[i][1];
-        a = cos(theta);
-        b = sin(theta);
-
-        x0 = a * rho;
-        y0 = b * rho;
-
-        p1 = Point(cvRound(x0 + 1000 * (-b)), cvRound(y0 + 1000 * a));
-        p2 = Point(cvRound(x0 - 1000 * (-b)), cvRound(y0 - 1000 * a));
-
-        line(result,p1,p2,Scalar(0,0,255),3,8);
+        avg_rho += rho;
+        avg_theta += theta;
+        count++;
     }
-    return result;
+    avg_rho = avg_rho/count;
+    avg_theta = avg_theta/count;
+    a = cos(avg_theta);
+    b = sin(avg_theta);
 
+    x0 = a * avg_rho;
+    y0 = b * avg_rho;
+
+    p1 = Point(cvRound(x0 + 1000 * (-b)), cvRound(y0 + 1000 * a));
+    p2 = Point(cvRound(x0 - 1000 * (-b)), cvRound(y0 - 1000 * a));
+
+    line(result,p1,p2,Scalar(0,0,255),3,8);
+    return result;
 }
+
+
 Mat line_merge_right(Mat input) {
     Mat edge, result;
     Rect right_rect(600,400,400,200); 
@@ -91,7 +102,7 @@ Mat line_merge_right(Mat input) {
     blur(gray_image, input_gray_blur,Size(5,5));
     // Canny Edge
     Canny(input_gray_blur, edge,10,60);
-    HoughLines(edge, lines,1 ,CV_PI / 180, 150,0, CV_PI, 120,150);
+    HoughLines(edge, lines,1 ,CV_PI / 180, 150,0, CV_PI, (120 * (CV_PI/180)),(150 * (CV_PI/180)));
     float avg_rho = 0;
     float avg_theta = 0;
     int count = 0;
@@ -141,7 +152,7 @@ int main() {
             Mat canny_frame_left = canny_edges_left(input);
             Mat canny_frame_right = canny_edges_right(input);
             Mat hough_left = line_merge_left(input);
-            Mat hough_right = line_merge_right(input);
+            Mat hough_right = line_merge_right(hough_left);
             namedWindow("Left canny");
             namedWindow("Right canny");
             moveWindow("Left canny", 200, 0);
