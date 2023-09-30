@@ -12,7 +12,7 @@ int main() {
     int delay;
     if (cap.open("background.mp4") == 0 ){
         cout << "no such file!" << endl;
-       waitKey(0);
+        waitKey(0);
     }
 
     fps = cap.get(CAP_PROP_FPS); 
