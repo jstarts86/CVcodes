@@ -12,7 +12,7 @@ int main() {
     int delay;
     if (cap.open("background.mp4") == 0 ){
         cout << "no such file!" << endl;
-        waitKey(0);
+       waitKey(0);
     }
 
     fps = cap.get(CAP_PROP_FPS); 
@@ -26,10 +26,10 @@ int main() {
             break;
         }
         imshow("video", frame);
-
+    
         waitKey(delay);
     }
-
+    
     double total_frame = cap.get(CAP_PROP_FRAME_COUNT);
     double time_in_msec = cap.get(CAP_PROP_POS_MSEC);
     int current_frame = cap.get(CAP_PROP_POS_FRAMES);
