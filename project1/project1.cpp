@@ -15,16 +15,20 @@ Mat sharpening(Mat input);
 Mat whiteBalancing(Mat input);
 
 Mat negative(Mat image) {
-    Mat negative_input = image.clone();
+    Mat negative_input;
+    vector<Mat> neg(3);
+    Mat channels[3];
+    cvtColor(image, negative_input, COLOR_BGR2HSV);
+    split(negative_input, channels);
     for(int j = 0; j < image.rows; j++) {
         for(int i = 0; i < image.cols; i++) {
-            Vec3b pixel = image.at<Vec3b>(j, i);
-            pixel[0] = 255 - pixel[0]; 
-            pixel[1] = 255 - pixel[1];
-            pixel[2] = 255 - pixel[2]; 
+            Vec3b pixel = negative_input.at<Vec3b>(j, i);
+            channels[2] = 255 - channels[2]; 
             negative_input.at<Vec3b>(j, i) = pixel;
         }
     }
+    merge(negative_input, channels);
+    cvtColor(negative_input, negative_input, COLOR_HSV2BGR);
     return negative_input;
 }
 
@@ -89,14 +93,6 @@ Mat colorSlicing(Mat image){
             else s[i] = 0; 
         }
     }
-    for (int j = 0; j < rows; j++) {
-        h = cc[0].ptr<uchar>(j);
-        s = cc[1].ptr<uchar>(j);
-        for (int i = 0; i < cols; i++) {
-            if (h[i] + 50 > 179) h[i] = h[i] + 50 - 179; 
-            else h[i] += 50;
-        }    
-    }   
     merge(mo, mask_out);
     cvtColor(mask_out, mask_out, COLOR_HSV2BGR); 
     return mask_out;
