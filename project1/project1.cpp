@@ -16,18 +16,11 @@ Mat whiteBalancing(Mat input);
 
 Mat negative(Mat image) {
     Mat negative_input;
-    vector<Mat> neg(3);
-    Mat channels[3];
+    vector<Mat> channels(3);
     cvtColor(image, negative_input, COLOR_BGR2HSV);
     split(negative_input, channels);
-    for(int j = 0; j < image.rows; j++) {
-        for(int i = 0; i < image.cols; i++) {
-            Vec3b pixel = negative_input.at<Vec3b>(j, i);
-            channels[2] = 255 - channels[2]; 
-            negative_input.at<Vec3b>(j, i) = pixel;
-        }
-    }
-    merge(negative_input, channels);
+    channels[2] = 255 - channels[2]; 
+    merge(channels, negative_input);
     cvtColor(negative_input, negative_input, COLOR_HSV2BGR);
     return negative_input;
 }
@@ -60,9 +53,6 @@ Mat histogram(Mat image){
     vector<Mat> ic(3);
     int rows = image.rows; 
     int cols = image.cols; 
-    uchar* h;
-    uchar* s;
-    uchar* v;
     cvtColor(image, HSV, COLOR_BGR2HSV); 
     split(HSV, ic);
     equalizeHist(ic[2], ic[2]);
@@ -72,19 +62,14 @@ Mat histogram(Mat image){
 }
 Mat colorSlicing(Mat image){
     Mat HSV, mask_out; 
-    vector<Mat> ic(3);
     vector<Mat> mo(3);
-    vector<Mat> cc(3);
     int rows = image.rows; 
     int cols = image.cols; 
     uchar* h;
     uchar* s;
     uchar* v;
     cvtColor(image, HSV, COLOR_BGR2HSV); 
-    split(HSV, ic);
     split(HSV, mo);
-    split(HSV, cc);
-    equalizeHist(ic[2], ic[2]);
     for (int j = 0; j < rows; j++) {
         h = mo[0].ptr<uchar>(j); 
         s = mo[1].ptr<uchar>(j);
