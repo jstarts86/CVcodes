@@ -112,8 +112,10 @@ Mat averageFilter(Mat image){
 Mat sharpening(Mat input){
     Mat blurred, mask, sharpened;
     blur(input, blurred, Size(9, 9));
-    subtract(input, blurred, mask);
-    add(input, mask, sharpened);
+    //subtract(input,blurred,mask);
+    mask = input - blurred;
+    sharpened = input + mask;
+    //add(input, mask, sharpened);
     return sharpened;
 }
 Mat whiteBalancing(Mat input){
