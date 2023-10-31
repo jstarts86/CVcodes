@@ -61,7 +61,7 @@ int main() {
             }
             total_rho /= lines1.size();
             total_theta /= lines1.size();
-
+            
             a = cos(total_theta);
             b = sin(total_theta);
             x0 = a * total_rho;
