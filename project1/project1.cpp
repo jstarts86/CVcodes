@@ -190,7 +190,7 @@ int main() {
                 case 'a': input = averageFilter(input); break;
                 case 'u': input = sharpening(input); break;
                 case 'w': input = whiteBalancing(input); break;
-                case 'r': input = originalFrame; break; // Reset to original frame
+                case 'r': input = originalFrame; break;
                 default: break; 
             }
             imshow("video", input);
