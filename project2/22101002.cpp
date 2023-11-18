@@ -24,6 +24,9 @@ int main() {
 
     vector<Vec2f> lines1, lines2, lines3;
 
+    // Assuming you want to keep the width and height of the ROIs the same
+    int width = 400;
+    int height = 200;
 
 
 
@@ -121,6 +124,7 @@ int main() {
             double totalPixels = image.total();
             double whitePercentage = (double(whitePixels) / totalPixels) * 100.0;
 
+    // Check if white pixels are more than 90%
             if (whitePercentage > 90.0) {
                 putText(frame, "Front Car is Moving", Point(50, 80), FONT_HERSHEY_SIMPLEX, 1,Scalar(0, 200, 200), 4);
                 cout << "LEAVE " << endl;
@@ -131,6 +135,7 @@ int main() {
             double totalPixels = image.total();
             double whitePercentage = (double(whitePixels) / totalPixels) * 100.0;
 
+    // Check if white pixels are more than 90%
             if (whitePercentage <= 30.0) {
                 putText(frame, "Front Car is Moving", Point(50, 80), FONT_HERSHEY_SIMPLEX, 1,Scalar(0, 200, 200), 4);
                 cout << "LEAVE " << endl;
