@@ -3,32 +3,12 @@
 
 using namespace std;
 using namespace cv;
-Mat applyDCT(Mat input) {
-    Mat floatInput;
-    input.convertTo(floatInput, CV_32F);
-    dct(floatInput, floatInput);
-    return floatInput;
+
+Mat applyDCTQuant(Mat input, Mat matrix) {
+
 }
 
-Mat applyQuantization(Mat input, Mat quantMatrix) {
-    Mat quantizedInput = input.clone();
-    for (int i = 0; i < input.rows; i += 8) {
-        for (int j = 0; j < input.cols; j += 8) {
-            Rect roi(j, i, 8, 8);
-            Mat block = quantizedInput(roi);
-            block = block / quantMatrix;
-            block.copyTo(quantizedInput(roi));
-        }
-    }
-    return quantizedInput;
-}
 
-Mat applyIDCT(Mat input) {
-    Mat output;
-    idct(input, output);
-    output.convertTo(output, CV_8U);
-    return output;
-}
 int main(int argc, char* argv[]) {
     Mat image;
     Mat image_Ycbcr;
@@ -61,33 +41,16 @@ int main(int argc, char* argv[]) {
         100, 100, 100, 100, 100, 100, 100, 100,
         100, 100, 100, 100, 100, 100, 100, 100);
     Mat Ycbcr_channels[3]; 
-
+    Mat y(512, 512, CV_8UC1);
     image = imread("lena.png", IMREAD_COLOR);
     cvtColor(image, image_Ycbcr, CV_BGR2YCrCb); 
-
     split(image_Ycbcr, Ycbcr_channels);
-
     Mat y = Ycbcr_channels[0].clone();
-    Mat dct_y = applyDCT
-    Mat qm1, qm2, qm3;
 
-    Mat qm1_dct_quantized = applyQuantization(dct_y, quantization_mat1);
-    Mat qm2_dct_quantized = applyQuantization(dct_y, quantization_mat2);
-    Mat qm3_dct_quantized = applyQuantization(dct_y, quantization_mat3);
-
-    Mat y_restored_qm1 = applyIDCT(qm1_dct_quantized);
-    Mat y_restored_qm2 = applyIDCT(qm2_dct_quantized);
-    Mat y_restored_qm3 = applyIDCT(qm3_dct_quantized);
-
-    imshow("Original Y", Ycbcr_channels[0]);
-    imshow("Restored Y QM1", y_restored_qm1);
-    imshow("Restored Y QM2", y_restored_qm2);
-    imshow("Restored Y QM3", y_restored_qm3);
-
-
-
+    Mat qm1 = applyDCTQuant(y, quantization_mat1);
+    Mat qm2 = applyDCTQuant(y, quantization_mat2);
+    Mat qm3 = applyDCTQuant(y, quantization_mat3);
     
-
     imshow("Orignal Y", y);
     imshow("QM1", qm1);
     imshow("QM2", qm2);
