@@ -71,34 +71,80 @@ FeatureMatching findImageFeatures(Mat query, Mat image) {
 int main() {
     Mat image1, image2, image3, image4;
     FeatureMatching matchedOneFromTwo, matchedTwoFromThree, matchedThreeFromFour;
-    Mat homographyOneFromTwo;
+    Mat homographyOneToTwo, homographyTwoToThree, homographyThreeToFour;
+    DoublePoints pointsFromOneToTwo, pointsFromTwoToThree, pointsFromThreeToFour;
     image1 = imread("pano1.jpg");
     image2 = imread("pano2.jpg");
     image3 = imread("pano3.jpg");
     image4 = imread("pano4.jpg");
-    resize(image1,image1, Size(480,640));
-    resize(image2,image2, Size(480,640));
-    resize(image3,image3, Size(480,640));
-    resize(image4,image4, Size(480,640));
+    // resize(image1,image1, Size(360,480));
+    // resize(image2,image2, Size(360,480));
+    // resize(image3,image3, Size(360,480));
+    // resize(image4,image4, Size(360,480));
+
+
     matchedOneFromTwo = findImageFeatures(image1, image2);
 
-    // homographyOneFromTwo = findHomography(matchedOneFromTwo.keypoints1,matchedOneFromTwo.keypoints2);
+    // homographyOneToTwo = findHomography(matchedOneFromTwo.keypoints1,matchedOneFromTwo.keypoints2);
     // warpPerspective(image1, image1, homographyOneFromTwo, Size(300,300));
 
-    DoublePoints pointsFromOnetoTwo = findPoints(matchedOneFromTwo);
-    homographyOneFromTwo = findHomography(pointsFromOnetoTwo.points1,pointsFromOnetoTwo.points2, RANSAC);
-    //warpPerspective(image1, image1, homographyOneFromTwo, Size(image1.cols, image1.rows));
+    pointsFromOneToTwo = findPoints(matchedOneFromTwo);
+    homographyOneToTwo = findHomography(pointsFromOneToTwo.points1,pointsFromOneToTwo.points2, RANSAC);
+    //warpPerspective(image1, image1, homographyOneToTwo, Size(image1.cols, image1.rows));    
     Mat warpImage2;
-    warpPerspective(image2, warpImage2, homographyOneFromTwo, Size(image1.cols + image2.cols, image2.rows));
+    warpPerspective(image2, warpImage2, homographyOneToTwo, Size(image1.cols, image1.rows * 1.2));
 
-    Mat fullImage(Size((image1.cols + image2.cols + image3.cols + image4.cols), image1.rows), image1.type());
-    Mat imageOneTwo(Size((image1.cols + image2.cols), image1.rows), image1.type());
+
+    matchedTwoFromThree = findImageFeatures(image2, image3);
+    pointsFromTwoToThree = findPoints(matchedTwoFromThree);
+    homographyTwoToThree = findHomography(pointsFromTwoToThree.points1, pointsFromTwoToThree.points2, RANSAC);
+    Mat warpImage3;
+    warpPerspective(image3, warpImage3, homographyTwoToThree, Size(image2.cols, warpImage2.rows));
+
+    matchedThreeFromFour = findImageFeatures(image3, image4);
+    pointsFromThreeToFour = findPoints(matchedThreeFromFour);
+    homographyThreeToFour = findHomography(pointsFromThreeToFour.points1, pointsFromThreeToFour.points2, RANSAC);
+    Mat warpImage4;
+    warpPerspective(image4, warpImage4, homographyThreeToFour, Size(image3.cols, warpImage3.rows));
+
+
+    Mat fullImage(Size((image1.cols + warpImage2.cols + warpImage3.cols + warpImage4.cols), image1.rows), image1.type());
+
+    // crop the first image
+    Mat crop_image1 = image1(Rect(0, 0 , image1.cols, image1.rows));
+    
+    
+    // For combining image one and two
     // Mat rectOne(imageOneTwo, Rect(0, 0, image1.cols, image1.rows));
     // Mat rectTwo(imageOneTwo, Rect(image1.cols, 0, image2.cols, image2.rows));
-    Mat rectOne(fullImage, Rect(0, 0, image1.cols, image1.rows));
-    Mat rectTwo(fullImage, Rect(image1.cols, 0, image2.cols, image2.rows));
-    image1.copyTo(rectOne);
+    
+    int crop_image1_width, image1_height, crop_image2_width, image2_height, crop_image3_width, image3_height, image4_height, crop_image4_width;
+
+    // Combining image one and warped image two
+    crop_image1_width = crop_image1.cols;
+    crop_image2_width = crop_image1_width + warpImage2.cols;
+    crop_image3_width = crop_image2_width + warpImage3.cols;
+    crop_image4_width = crop_image3_width + warpImage4.cols;
+    Mat rectOne(fullImage, Rect(0, 0, crop_image1_width, image1.rows));
+    Mat rectTwo(fullImage, Rect(crop_image1_width, 0, warpImage2.cols, image2.rows));
+    Mat rectThree(fullImage, Rect(crop_image2_width, 0, warpImage3.cols, image3.rows));
+    Mat rectFour(fullImage, Rect(crop_image3_width, 0, warpImage4.cols, image4.rows));
+
+    // For cropped image 1
+    // Mat rectOne(fullImage, Rect(0, 0, crop_image_one.cols, crop_image_one.rows));
+    // Mat rectTwo(fullImage, Rect(crop_image_one.cols, 0, image2.cols, image2.rows));
+    // crop_image_one.copyTo(rectOne);
+
+
+    // copy the image on and two to the canvas
+    crop_image1.copyTo(rectOne);
     warpImage2.copyTo(rectTwo);
+    warpImage3.copyTo(rectThree);
+    warpImage4.copyTo(rectFour);
+
+
+    resize(fullImage,fullImage, Size(360,480));
+    // show the canvas
     imshow("full image", fullImage);
     //imshow("1 and 2 image", imageOneTwo);
     //imshow("test1", image1);

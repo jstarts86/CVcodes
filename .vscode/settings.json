@@ -3,6 +3,7 @@
         "ostream": "cpp",
         "vector": "cpp",
         "list": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "__locale": "cpp"
     }
 }
